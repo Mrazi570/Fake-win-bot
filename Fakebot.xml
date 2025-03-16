@@ -1,0 +1,76 @@
+<html:xml xmlns:html="http://www.w3.org/1999/xhtml" collection="false">
+  <html:variables>
+    <html:variable type="" id="Win_Count">Win Count</html:variable>
+    <html:variable type="" id="Target_Profit">Target Profit</html:variable>
+    <html:variable type="" id="Stop_Loss">Stop Loss</html:variable>
+    <html:variable type="" id="First_Stake">First Stake</html:variable>
+    <html:variable type="" id="Martingale_Factor">Martingale Factor</html:variable>
+    <html:variable type="" id="Martingale_Level">Martingale Level</html:variable>
+  </html:variables>
+
+  <html:block type="trade" id="trade_block" x="0" y="0">
+    <html:field name="MARKET_LIST">synthetic_index</html:field>
+    <html:field name="TRADETYPE_LIST">evenodd</html:field>
+    <html:field name="TYPE_LIST">both</html:field>
+    <html:field name="DURATIONTYPE_LIST">t</html:field>
+    <html:field name="CURRENCY_LIST">USD</html:field>
+
+    <html:statement name="INITIALIZATION">
+      <html:block type="procedures_callnoreturn" id="init_block">
+        <html:mutation name="Trade Setup">
+          <html:arg name="Target Profit" />
+          <html:arg name="Stop Loss" />
+          <html:arg name="First Stake" />
+          <html:arg name="Martingale Factor" />
+          <html:arg name="Martingale Level" />
+        </html:mutation>
+      </html:block>
+    </html:statement>
+  </html:block>
+
+  <html:block type="tick_analysis" id="tick_analysis_block" x="0" y="500">
+    <html:statement name="TICKANALYSIS_STACK">
+      <html:block type="controls_if" id="check_fake_win">
+        <html:value name="IF0">
+          <html:block type="logic_compare" id="compare_block">
+            <html:field name="OP">EQ</html:field>
+            <html:value name="A">
+              <html:block type="variables_get" id="get_win_count">
+                <html:field name="VAR" id="Win_Count" variabletype="">Win Count</html:field>
+              </html:block>
+            </html:value>
+            <html:value name="B">
+              <html:block type="math_number" id="number_block">
+                <html:field name="NUM">1</html:field>
+              </html:block>
+            </html:value>
+          </html:block>
+        </html:value>
+        <html:statement name="DO0">
+          <html:block type="text_print" id="print_fake_win">
+            <html:value name="TEXT">
+              <html:shadow type="text">
+                <html:field name="TEXT">Fake win detected, processing real trade...</html:field>
+              </html:shadow>
+            </html:value>
+          </html:block>
+        </html:statement>
+      </html:block>
+    </html:statement>
+  </html:block>
+
+  <html:block type="after_purchase" id="after_trade_block" x="0" y="800">
+    <html:statement name="AFTERPURCHASE_STACK">
+      <html:block type="controls_if" id="check_win">
+        <html:value name="IF0">
+          <html:block type="contract_check_result" id="win_check">
+            <html:field name="CHECK_RESULT">win</html:field>
+          </html:block>
+        </html:value>
+        <html:statement name="DO0">
+          <html:block type="trade_again" id="repeat_trade" />
+        </html:statement>
+      </html:block>
+    </html:statement>
+  </html:block>
+</html:xml>
